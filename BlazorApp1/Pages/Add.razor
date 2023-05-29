@@ -1,0 +1,39 @@
+﻿
+@page "/create-widget"
+@inject IEventWidgetService WidgetService
+@inject NavigationManager NavigationManager
+@using BlazorApp1.Models;
+@using BlazorApp1.Services;
+
+
+<h3>Создание событий</h3>
+
+<form>
+    <div class="form-group">
+        <label for="title">Название</label>
+        <input type="text" class="form-control" id="title" @bind="@newWidget.Title" />
+    </div>
+    <div class="form-group">
+        <label for="description">Описание</label>
+        <input type="text" class="form-control" id="description" @bind="@newWidget.Description" />
+    </div>
+    <div class="form-group">
+        <label for="eventDate">Дата</label>
+        <input type="text" class="form-control" id="eventDate" @bind="@newWidget.EventDate" />
+    </div>
+    <div class="form-group">
+        <label for="photoUrl">Ссылка на фото</label>
+        <input type="text" class="form-control" id="photoUrl" @bind="@newWidget.PhotoUrl" />
+    </div>
+    <button type="button" class="btn btn-primary" @onclick="CreateWidget">Создать</button>
+</form>
+
+@code {
+    EventWidget newWidget = new EventWidget();
+
+    async Task CreateWidget()
+    {
+        await WidgetService.AddWidget(newWidget);
+        NavigationManager.NavigateTo("/");
+    }
+}
