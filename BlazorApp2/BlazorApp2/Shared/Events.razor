@@ -1,0 +1,49 @@
+﻿@using BlazorApp2.Models;
+@using BlazorApp2.Services;
+@inject IEventWidgetService WidgetService
+@{
+    var today = DateTimeOffset.Now;
+    var currentMonth = today.Month;
+    var currentDay = today.Day;
+    var currentYear = today.Year;
+}
+
+
+
+
+@if (widgets == null)
+{
+    <p>Loading...</p>
+}
+else if (widgets.Count == 0)
+{
+    <p>No widgets found.</p>
+}
+else
+{
+    <div class="container">
+        <ul class="widget-list">
+            @foreach (var widget in widgets)
+            {
+                @if (widget.EventMonth == currentMonth && widget.EventDay == currentDay && widget.EventYear == currentYear)
+                {
+                    <div class="widget">
+                        <!-- Отображение виджета -->
+                        <h4>@widget.Title</h4>
+                        <div>@widget.Description</div>
+                        <img src="@widget.PhotoUrl" alt="Widget Photo" />
+                        <div>@widget.EventDate.ToString("dd.MM")</div>
+                    </div>
+                }
+            }
+        </ul>
+    </div>
+}
+@code {
+    List<EventWidget> widgets;
+
+    protected override async Task OnInitializedAsync()
+    {
+        widgets = await WidgetService.GetWidgetsForCurrentDate();
+    }
+}
