@@ -104,7 +104,7 @@ using BlazorApp2.Services;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 42 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\Events.razor"
+#line 33 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\Events.razor"
        
     List<EventWidget> widgets;
 

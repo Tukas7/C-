@@ -1,15 +1,6 @@
 ﻿@using BlazorApp2.Models;
 @using BlazorApp2.Services;
 @inject IEventWidgetService WidgetService
-@{
-    var today = DateTimeOffset.Now;
-    var currentMonth = today.Month;
-    var currentDay = today.Day;
-    var currentYear = today.Year;
-}
-
-
-
 
 @if (widgets == null)
 {
@@ -21,22 +12,22 @@ else if (widgets.Count == 0)
 }
 else
 {
-    <div class="container">
-        <ul class="widget-list">
-            @foreach (var widget in widgets)
-            {
-                @if (widget.EventMonth == currentMonth && widget.EventDay == currentDay && widget.EventYear == currentYear)
+    <div class="widget-container">
+        @foreach (var widget in widgets)
+        {
+            <div class="widget">
+                <h4>@widget.Title</h4>
+                <p>@widget.Description</p>
+                @if (widget.Images != null && widget.Images.Count > 0)
                 {
-                    <div class="widget">
-                        <!-- Отображение виджета -->
-                        <h4>@widget.Title</h4>
-                        <div>@widget.Description</div>
-                        <img src="@widget.PhotoUrl" alt="Widget Photo" />
-                        <div>@widget.EventDate.ToString("dd.MM")</div>
-                    </div>
+                    foreach (var image in widget.Images)
+                    {
+                        <img class="eventImg" src="data:image/png;base64,@Convert.ToBase64String(image)" alt="Event Image" />
+                    }
                 }
-            }
-        </ul>
+                <p>@widget.EventDate.ToString("dd.MM.yyyy")</p>
+            </div>
+        }
     </div>
 }
 @code {

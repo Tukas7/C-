@@ -1,4 +1,11 @@
-﻿@inject IEventWidgetService WidgetService
+﻿@using System;
+@using System.Collections.Generic;
+@using System.ComponentModel.DataAnnotations;
+@using System.ComponentModel.DataAnnotations.Schema;
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Http
+@using System.IO
+@inject IEventWidgetService WidgetService
 @inject NavigationManager NavigationManager
 @using BlazorApp2.Models;
 @using BlazorApp2.Services;
@@ -14,26 +21,39 @@
     </div>
     <div class="form-group">
         <label for="eventDate">Дата</label>
-        <input type="text" class="form-control" id="eventDate" @bind="@formattedDate" />
+        <input type="text" placeholder="01.01.2023" class="form-control" id="eventDate" @bind="@formattedDate" />
     </div>
     <div class="form-group">
-        <label for="photoUrl">Ссылка на фото</label>
-        <input type="text" class="form-control" id="photoUrl" @bind="@newWidget.PhotoUrl" />
+        <label for="photo">Ссылка на фото</label>
+        <InputFile id="widgetImages" accept="image/*" multiple="true"  OnChange="HandleFileChange" />
     </div>
     <button type="button" class="btn btn-primary" @onclick="CreateWidget">Создать</button>
 </form>
-
+    
 @code {
     private EventWidget newWidget = new EventWidget();
+    private List<byte[]> uploadedImages = new List<byte[]>();
     private string formattedDate;
 
-    async Task CreateWidget()
+    private async Task HandleFileChange(InputFileChangeEventArgs e)
     {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var imageStream = file.OpenReadStream();
+            using (var memoryStream = new MemoryStream())
+            {
+                await imageStream.CopyToAsync(memoryStream);
+                uploadedImages.Add(memoryStream.ToArray());
+            }
+        }
+    }
+        
+    async Task CreateWidget()
+    {   
         if (DateTime.TryParse(formattedDate, out DateTime parsedDate))
         {
             newWidget.EventDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
-
-            await WidgetService.AddWidget(newWidget);
+                await WidgetService.AddWidget(newWidget, uploadedImages);
             NavigationManager.NavigateTo("/");
         }
     }

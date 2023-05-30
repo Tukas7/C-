@@ -26,9 +26,28 @@ namespace BlazorApp2.Services
                 .ToListAsync();
         }
 
-        public async Task AddWidget(EventWidget widget)
+        public async Task AddWidget(EventWidget widget, List<byte[]> images)
         {
+            widget.Images = images;
             _context.EventWidgets.Add(widget);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<EventWidget> GetWidgetById(int id)
+        {
+            return await _context.EventWidgets.FindAsync(id);
+        }
+
+        public async Task UpdateWidget(EventWidget widget)
+        {
+            _context.Entry(widget).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteWidget(int id)
+        {
+            var widget = await _context.EventWidgets.FindAsync(id);
+            _context.EventWidgets.Remove(widget);
             await _context.SaveChangesAsync();
         }
     }

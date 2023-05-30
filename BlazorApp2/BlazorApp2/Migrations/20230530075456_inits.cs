@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace BlazorApp2.Migrations
 {
-    public partial class initss : Migration
+    public partial class inits : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,7 +18,7 @@ namespace BlazorApp2.Migrations
                     Title = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     EventDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    PhotoUrl = table.Column<string>(type: "text", nullable: true)
+                    Images = table.Column<List<byte[]>>(type: "bytea[]", nullable: true)
                 },
                 constraints: table =>
                 {
