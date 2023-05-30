@@ -7,10 +7,11 @@ namespace BlazorApp2.Services
 {
     public interface IEventWidgetService
     {
+        Task<List<EventWidget>> GetAllWidgets();
         Task<List<EventWidget>> GetWidgetsForCurrentDate();
         Task AddWidget(EventWidget widget, List<byte[]> images);
         Task<EventWidget> GetWidgetById(int id);
-        Task UpdateWidget(EventWidget widget);
+        Task UpdateWidget(EventWidget widget, List<byte[]> images);
         Task DeleteWidget(int id);
     }
 }

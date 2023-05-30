@@ -65,7 +65,7 @@ C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\ne
 C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\ref\BlazorApp2.dll
 C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\RazorDeclaration\Pages\Widgets.razor.g.cs
 C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\Razor\Pages\Widgets.razor.g.cs
-C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\RazorDeclaration\Shared\AddEvent.razor.g.cs
-C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\Razor\Shared\AddEvent.razor.g.cs
 C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\RazorDeclaration\Shared\Events.razor.g.cs
 C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\Razor\Shared\Events.razor.g.cs
+C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\RazorDeclaration\Shared\CRUDEvents.razor.g.cs
+C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\Razor\Shared\CRUDEvents.razor.g.cs

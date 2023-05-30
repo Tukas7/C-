@@ -17,6 +17,11 @@ namespace BlazorApp2.Services
             _context = context;
         }
 
+        public async Task<List<EventWidget>> GetAllWidgets()
+        {
+            return await _context.EventWidgets.ToListAsync();
+        }
+
         public async Task<List<EventWidget>> GetWidgetsForCurrentDate()
         {
             var currentDate = DateTime.Now.Date;
@@ -38,8 +43,9 @@ namespace BlazorApp2.Services
             return await _context.EventWidgets.FindAsync(id);
         }
 
-        public async Task UpdateWidget(EventWidget widget)
+        public async Task UpdateWidget(EventWidget widget, List<byte[]> images)
         {
+            widget.Images = images;
             _context.Entry(widget).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
