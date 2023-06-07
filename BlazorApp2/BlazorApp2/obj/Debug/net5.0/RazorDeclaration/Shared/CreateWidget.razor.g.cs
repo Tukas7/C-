@@ -82,7 +82,7 @@ using BlazorApp2.Shared;
 #line default
 #line hidden
 #nullable disable
-    public partial class ViewEvent : global::Microsoft.AspNetCore.Components.ComponentBase
+    public partial class CreateWidget : global::Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
         protected override void BuildRenderTree(global::Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder __builder)

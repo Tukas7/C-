@@ -1,0 +1,195 @@
+﻿@using BlazorApp2.Models
+@using System.ComponentModel.DataAnnotations
+@using System.IO
+@using BlazorApp2.Services
+@using Blazorise
+@using Blazorise.Icons.FontAwesome
+
+
+<h3>Список событий</h3>
+
+@if (widgets != null && widgets.Any())
+{
+    <div id="widgetTable">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Дата</th>
+                    <th>Картинка</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var widget in widgets.OrderBy(w => w.EventDate))
+                {
+                    <tr>
+                        <td>@widget.Title</td>
+                        <td>@widget.Description</td>
+                        <td>@widget.EventDate.ToShortDateString()</td>
+                        <td>
+                            @if (widget.Images != null && widget.Images.Any())
+                            {
+                                foreach (var image in widget.Images)
+                                {
+                                    <img class="eventImgs" width="450" height="300" src="data:image/png;base64,@Convert.ToBase64String(image)" alt="Event Image" />
+                                }
+                            }
+                        </td>
+                        <td>
+                            <button @onclick="(() => EditWidget(widget.Id))">Изменить</button>
+                            <button class="btn btn-danger" @onclick="() => ShowDeleteConfirmation(widget.Id)">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>Нет доступных событий.</p>
+}
+
+@if (editedWidget != null)
+{
+    <div class="modal-overlay">
+        <div class="modal">
+            <h3>Редактировать виджет</h3>
+            <EditForm Model="@editedWidget" OnValidSubmit="@(async () => await UpdateWidget(editedWidget, uploadedImages, deleteAllImages))">
+
+                <div>
+                    <label>Название:</label>
+                    <InputText @bind-Value="@editedWidget.Title" />
+                </div>
+                <div>
+                    <label>Описание:</label>
+                    <InputText @bind-Value="@editedWidget.Description" />
+                </div>
+                <div>
+                    <label>Дата:</label>
+                    <InputDate @bind-Value="@editedWidget.EventDate" />
+                </div>
+                <div>
+                    <label>Удалить все картинки:</label>
+                    <input type="checkbox" @bind="deleteAllImages" />
+                </div>
+                <div class="form-group">
+                    <label for="widgetImages">Картинка: </label>
+                    <InputFile id="widgetImages" accept="image/*" multiple="true" OnChange="HandleFileChange" />
+                </div>
+                <div>
+                    <button type="submit">Сохранить</button>
+                    <button type="button" @onclick="CancelEdit">Отмена</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@if (showDeleteConfirmation)
+{
+    <div class="confirm-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Подтверждение</h5>
+                </div>
+                <div class="modal-body">
+                    Вы точно хотите удалить?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="DeleteWidget">Удалить</button>
+                    <button type="button" class="btn btn-secondary" @onclick="() => showDeleteConfirmation = false">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<EventWidget> widgets;
+    private bool showDeleteConfirmation = false;
+    private Guid widgetToDeleteId;
+    private EventWidget editedWidget;
+    private List<byte[]> uploadedImages = new List<byte[]>();
+    private bool deleteAllImages = false;
+    
+
+
+    [Inject]
+    private IEventWidgetService WidgetService { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        widgets = await WidgetService.SortWidgetsByDate();
+    }
+
+    private void EditWidget(Guid widgetId)
+    {
+        editedWidget = widgets.FirstOrDefault(w => w.Id == widgetId);
+        uploadedImages = new List<byte[]>(editedWidget.Images);
+    }
+
+    private void ShowDeleteConfirmation(Guid id)
+    {
+        widgetToDeleteId = id;
+        showDeleteConfirmation = true;
+    }
+
+    public async Task UpdateWidget(EventWidget widget, List<byte[]> images, bool deleteAllImages)
+    {
+        var widgetToUpdate = await WidgetService.GetWidgetById(widget.Id);
+        if (widgetToUpdate != null)
+        {
+            widgetToUpdate.Title = widget.Title;
+            widgetToUpdate.Description = widget.Description;
+            widgetToUpdate.EventDate = widget.EventDate;
+
+            if (deleteAllImages)
+            {
+                widgetToUpdate.Images.Clear();
+                uploadedImages.Clear();
+            }
+            else if (uploadedImages.Count > 0)
+            {
+                widgetToUpdate.Images = uploadedImages;
+            }
+
+            await WidgetService.UpdateWidget(widgetToUpdate, uploadedImages);
+            uploadedImages.Clear();
+            editedWidget = null;
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+
+        }
+    }
+
+    private async Task DeleteWidget()
+    {
+        await WidgetService.DeleteWidget(widgetToDeleteId);
+        showDeleteConfirmation = false;
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    private void CancelEdit()
+    {
+        editedWidget = null;
+        uploadedImages = new List<byte[]>();
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            await using var memoryStream = new MemoryStream();
+            await file.OpenReadStream(10485760).CopyToAsync(memoryStream);
+            uploadedImages.Add(memoryStream.ToArray());
+        }
+    }
+
+}

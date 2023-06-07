@@ -45,6 +45,30 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
+            "BlazorInputFile": {
+              "target": "Package",
+              "version": "[0.2.0, )"
+            },
+            "Blazorise": {
+              "target": "Package",
+              "version": "[0.9.5.7, )"
+            },
+            "Blazorise.Bootstrap": {
+              "target": "Package",
+              "version": "[0.9.5.7, )"
+            },
+            "Blazorise.Components": {
+              "target": "Package",
+              "version": "[0.9.5.7, )"
+            },
+            "Blazorise.DataGrid": {
+              "target": "Package",
+              "version": "[0.9.5.7, )"
+            },
+            "Blazorise.Icons.FontAwesome": {
+              "target": "Package",
+              "version": "[0.9.5.7, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[5.0.13, )"

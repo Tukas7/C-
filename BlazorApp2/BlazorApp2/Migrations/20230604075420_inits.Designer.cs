@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BlazorApp2.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230530075456_inits")]
+    [Migration("20230604075420_inits")]
     partial class inits
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,10 +24,9 @@ namespace BlazorApp2.Migrations
 
             modelBuilder.Entity("BlazorApp2.Models.EventWidget", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");

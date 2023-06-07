@@ -4,7 +4,9 @@
 
 
 
-
+#widgetTable {
+    animation: none !important;
+}
 
 /* Стили для создания событий */
 .event-form {

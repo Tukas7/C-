@@ -31,6 +31,11 @@ namespace BlazorApp2.Services
                 .ToListAsync();
         }
 
+        public async Task<List<EventWidget>>SortWidgetsByDate()
+        {
+            return await _context.EventWidgets.OrderBy(w => w.EventDate).ToListAsync();
+        }
+
         public async Task AddWidget(EventWidget widget, List<byte[]> images)
         {
             widget.Images = images;
@@ -38,7 +43,7 @@ namespace BlazorApp2.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<EventWidget> GetWidgetById(int id)
+        public async Task<EventWidget> GetWidgetById(Guid id)
         {
             return await _context.EventWidgets.FindAsync(id);
         }
@@ -50,7 +55,7 @@ namespace BlazorApp2.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteWidget(int id)
+        public async Task DeleteWidget(Guid id)
         {
             var widget = await _context.EventWidgets.FindAsync(id);
             _context.EventWidgets.Remove(widget);

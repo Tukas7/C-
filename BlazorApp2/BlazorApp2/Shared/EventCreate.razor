@@ -1,0 +1,95 @@
+﻿@using BlazorApp2.Models
+@using System.ComponentModel.DataAnnotations
+@using System.IO
+@using BlazorApp2.Services
+
+<h3>Создать событие</h3>
+
+<EditForm Model="@newWidget" OnValidSubmit="CreateWidget">
+    <div class="form-group">
+        <label for="title">Название</label>
+        <InputText id="title" class="form-control" @bind-Value="@newWidget.Title" />
+        <ValidationMessage For="@(() => newWidget.Title)" />
+    </div>
+    <div class="form-group">
+        <label for="description">Описание</label>
+        <InputText id="description" class="form-control" @bind-Value="@newWidget.Description" />
+        <ValidationMessage For="@(() => newWidget.Description)" />
+    </div>
+    <div class="form-group">
+        <label for="eventDate">Дата</label>
+        <InputDate id="eventDate" class="form-control" @bind-Value="@newWidget.EventDate" />
+        <ValidationMessage For="@(() => newWidget.EventDate)" />
+    </div>
+    <div class="form-group">
+        <label for="widgetImages">Картинка: </label>
+        <InputFile id="widgetImages" accept="image/*" multiple="true" max="52428800" OnChange="HandleFileChange" />
+    </div>
+    <button type="submit" class="btn btn-primary">Создать</button>
+</EditForm>
+
+@code {
+    private EventWidget newWidget = new EventWidget { EventDate = DateTime.Today };
+    private List<byte[]> uploadedImages = new List<byte[]>();
+
+    [Inject]
+    private IEventWidgetService WidgetService { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private async Task CreateWidget()
+    {
+        if (await ValidateWidget(newWidget))
+        {
+            await WidgetService.AddWidget(newWidget, uploadedImages);
+            ClearForm();
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        }
+    }
+
+    private async Task<bool> ValidateWidget(EventWidget widget)
+    {
+        var validationContext = new ValidationContext(widget);
+        var validationResults = new List<ValidationResult>();
+
+        var isValid = await Task.Run(() => Validator.TryValidateObject(widget, validationContext, validationResults, true));
+
+        if (!isValid)
+        {
+            foreach (var validationResult in validationResults)
+            {
+                var propertyNames = validationResult.MemberNames.Any()
+                    ? validationResult.MemberNames
+                    : new string[] { null };
+
+                foreach (var propertyName in propertyNames)
+                {
+                    var errorKey = propertyName != null
+                        ? $"{propertyName}"
+                        : "";
+
+                    var errorMessage = validationResult.ErrorMessage;
+                }
+            }
+        }
+
+        return isValid;
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            await using var memoryStream = new MemoryStream();
+            await file.OpenReadStream(10485760).CopyToAsync(memoryStream);
+            uploadedImages.Add(memoryStream.ToArray());
+        }
+    }
+
+    private void ClearForm()
+    {
+        newWidget = new EventWidget();
+        uploadedImages.Clear();
+    }
+}

@@ -12,6 +12,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BlazorApp2.Services;
+using Microsoft.AspNetCore.Http.Features;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 
 namespace BlazorApp2
 {
@@ -35,6 +39,20 @@ namespace BlazorApp2
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<IEventWidgetService, EventWidgetService>();
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueCountLimit = 10;
+                options.ValueLengthLimit = 1024 * 1024 * 10; 
+                options.MultipartBodyLengthLimit = 1024 * 1024 * 10;
+            });
+            services.AddBlazorise(options =>
+            {
+                options.ChangeTextOnKeyPress = true;
+            })
+            .AddBootstrapProviders()
+            .AddFontAwesomeIcons();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -83,34 +83,69 @@ using BlazorApp2.Shared;
 #line hidden
 #nullable disable
 #nullable restore
-#line 2 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\CRUDEvents.razor"
+#line 11 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
+using Blazorise;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 12 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
+using Blazorise.Bootstrap;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 13 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
+using Blazorise.Icons.FontAwesome;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 14 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
+using Blazorise.DataGrid;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 15 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
+using Blazorise.Components;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
 using BlazorApp2.Models;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 3 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\CRUDEvents.razor"
+#line 2 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
 using System.ComponentModel.DataAnnotations;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 4 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\CRUDEvents.razor"
+#line 3 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
 using System.IO;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 5 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\CRUDEvents.razor"
+#line 4 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
 using BlazorApp2.Services;
 
 #line default
 #line hidden
 #nullable disable
-    public partial class CRUDEvents : global::Microsoft.AspNetCore.Components.ComponentBase
+    public partial class EventCreate : global::Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
         protected override void BuildRenderTree(global::Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder __builder)
@@ -118,14 +153,10 @@ using BlazorApp2.Services;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 133 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\CRUDEvents.razor"
+#line 31 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
        
-    private List<EventWidget> widgets;
-    private EventWidget newWidget = new EventWidget();
+    private EventWidget newWidget = new EventWidget { EventDate = DateTime.Today };
     private List<byte[]> uploadedImages = new List<byte[]>();
-    private bool showDeleteConfirmation = false;
-    private int widgetToDeleteId;
-    private EventWidget editedWidget;
 
     [Inject]
     private IEventWidgetService WidgetService { get; set; }
@@ -133,78 +164,14 @@ using BlazorApp2.Services;
     [Inject]
     private NavigationManager NavigationManager { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        // Загрузка данных из базы данных
-        widgets = await WidgetService.GetAllWidgets();
-    }
-
-    private async Task HandleFileChange(InputFileChangeEventArgs e)
-    {
-        foreach (var file in e.GetMultipleFiles())
-        {
-            var imageStream = file.OpenReadStream();
-            using (var memoryStream = new MemoryStream())
-            {
-                await imageStream.CopyToAsync(memoryStream);
-                uploadedImages.Add(memoryStream.ToArray());
-            }
-        }
-    }
-
     private async Task CreateWidget()
     {
         if (await ValidateWidget(newWidget))
         {
             await WidgetService.AddWidget(newWidget, uploadedImages);
             ClearForm();
-            widgets = await WidgetService.GetAllWidgets();
-            RefreshPage();
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
-    }
-
-    public async Task UpdateWidget(EventWidget widget, List<byte[]> images)
-    {
-        var widgetToUpdate = await WidgetService.GetWidgetById(widget.Id);
-        if (widgetToUpdate != null)
-        {
-            // Обновление только описания и даты
-            widgetToUpdate.Title = widget.Title;
-            widgetToUpdate.Description = widget.Description;
-            widgetToUpdate.EventDate = widget.EventDate;
-
-            if (images.Count > 0)
-            {
-                // Обновление картинок, если были выбраны новые изображения
-                widgetToUpdate.Images = images;
-            }
-
-            await WidgetService.UpdateWidget(widgetToUpdate, images);
-            widgets = await WidgetService.GetAllWidgets();
-            RefreshPage();
-        }
-    }
-
-    private async Task DeleteWidget()
-    {
-        await WidgetService.DeleteWidget(widgetToDeleteId);
-        widgets.RemoveAll(w => w.Id == widgetToDeleteId);
-        showDeleteConfirmation = false;
-        RefreshPage();
-    }
-
-    private void EditWidget(int widgetId)
-    {
-        editedWidget = widgets.FirstOrDefault(w => w.Id == widgetId);
-        // Сохраняем список изображений в отдельной переменной
-        uploadedImages = new List<byte[]>(editedWidget.Images);
-    }
-
-
-    private void ShowDeleteConfirmation(int id)
-    {
-        widgetToDeleteId = id;
-        showDeleteConfirmation = true;
     }
 
     private async Task<bool> ValidateWidget(EventWidget widget)
@@ -212,7 +179,9 @@ using BlazorApp2.Services;
         var validationContext = new ValidationContext(widget);
         var validationResults = new List<ValidationResult>();
 
-        if (!Validator.TryValidateObject(widget, validationContext, validationResults, true))
+        var isValid = await Task.Run(() => Validator.TryValidateObject(widget, validationContext, validationResults, true));
+
+        if (!isValid)
         {
             foreach (var validationResult in validationResults)
             {
@@ -227,32 +196,27 @@ using BlazorApp2.Services;
                         : "";
 
                     var errorMessage = validationResult.ErrorMessage;
-                    
                 }
             }
-
-            return false;
         }
 
-        return true;
+        return isValid;
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            await using var memoryStream = new MemoryStream();
+            await file.OpenReadStream(10485760).CopyToAsync(memoryStream);
+            uploadedImages.Add(memoryStream.ToArray());
+        }
     }
 
     private void ClearForm()
     {
         newWidget = new EventWidget();
         uploadedImages.Clear();
-    }
-
-
-    private void CancelEdit()
-    {
-        editedWidget = null;
-        uploadedImages.Clear();
-    }
-
-    private void RefreshPage()
-    {
-        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
 
 #line default

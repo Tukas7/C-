@@ -1,3 +1,8 @@
 ﻿<StaticWebAssets Version="1.0">
   <ContentRoot BasePath="/" Path="C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\obj\Debug\net5.0\scopedcss\bundle\" />
+  <ContentRoot BasePath="_content/BlazorInputFile" Path="C:\Users\Максим\.nuget\packages\blazorinputfile\0.2.0\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Blazorise" Path="C:\Users\Максим\.nuget\packages\blazorise\0.9.5.7\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Blazorise.Bootstrap" Path="C:\Users\Максим\.nuget\packages\blazorise.bootstrap\0.9.5.7\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Blazorise.DataGrid" Path="C:\Users\Максим\.nuget\packages\blazorise.datagrid\0.9.5.7\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Blazorise.Snackbar" Path="C:\Users\Максим\.nuget\packages\blazorise.snackbar\0.9.5.7\build\..\staticwebassets\" />
 </StaticWebAssets>

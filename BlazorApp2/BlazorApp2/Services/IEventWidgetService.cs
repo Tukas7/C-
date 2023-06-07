@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BlazorApp2.Models;
 
@@ -9,9 +10,11 @@ namespace BlazorApp2.Services
     {
         Task<List<EventWidget>> GetAllWidgets();
         Task<List<EventWidget>> GetWidgetsForCurrentDate();
+
+        Task<List<EventWidget>> SortWidgetsByDate();
         Task AddWidget(EventWidget widget, List<byte[]> images);
-        Task<EventWidget> GetWidgetById(int id);
+        Task<EventWidget> GetWidgetById(Guid id);
         Task UpdateWidget(EventWidget widget, List<byte[]> images);
-        Task DeleteWidget(int id);
+        Task DeleteWidget(Guid id);
     }
 }
