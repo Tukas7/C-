@@ -16,5 +16,6 @@ namespace BlazorApp2.Services
         Task<EventWidget> GetWidgetById(Guid id);
         Task UpdateWidget(EventWidget widget, List<byte[]> images);
         Task DeleteWidget(Guid id);
+
     }
 }

@@ -1,8 +1,6 @@
-﻿@using BlazorApp2.Models
-@using System.ComponentModel.DataAnnotations
-@using System.IO
-@using BlazorApp2.Services
-
+﻿@using System.IO;
+@using BlazorApp2.Models;
+@using BlazorApp2.Services;
 <h3>Создать событие</h3>
 
 <EditForm Model="@newWidget" OnValidSubmit="CreateWidget">
@@ -10,22 +8,36 @@
         <label for="title">Название</label>
         <InputText id="title" class="form-control" @bind-Value="@newWidget.Title" />
         <ValidationMessage For="@(() => newWidget.Title)" />
+        @if (string.IsNullOrEmpty(newWidget.Title))
+        {
+            <p class="text-danger">Поле 'Название' не может быть пустым.</p>
+        }
     </div>
     <div class="form-group">
         <label for="description">Описание</label>
         <InputText id="description" class="form-control" @bind-Value="@newWidget.Description" />
         <ValidationMessage For="@(() => newWidget.Description)" />
+        @if (string.IsNullOrEmpty(newWidget.Description))
+        {
+            <p class="text-danger">Поле 'Описание' не может быть пустым.</p>
+        }
     </div>
     <div class="form-group">
         <label for="eventDate">Дата</label>
         <InputDate id="eventDate" class="form-control" @bind-Value="@newWidget.EventDate" />
-        <ValidationMessage For="@(() => newWidget.EventDate)" />
+        <ValidationMessage For="@(() => newWidget.EventDate)" ErrorMessage="Неверный формат даты. Пожалуйста, введите корректную дату." />
     </div>
     <div class="form-group">
         <label for="widgetImages">Картинка: </label>
         <InputFile id="widgetImages" accept="image/*" multiple="true" max="52428800" OnChange="HandleFileChange" />
     </div>
-    <button type="submit" class="btn btn-primary">Создать</button>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Создать</button>
+        @if (ValidationErrorsExist())
+        {
+            <p class="text-danger">Пожалуйста, исправьте все ошибки перед созданием события.</p>
+        }
+    </div>
 </EditForm>
 
 @code {
@@ -38,43 +50,29 @@
     [Inject]
     private NavigationManager NavigationManager { get; set; }
 
+
     private async Task CreateWidget()
     {
-        if (await ValidateWidget(newWidget))
+        if (!IsValidForm())
         {
-            await WidgetService.AddWidget(newWidget, uploadedImages);
-            ClearForm();
-            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+            return;
         }
+
+        await WidgetService.AddWidget(newWidget, uploadedImages);
+        ClearForm();
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
 
-    private async Task<bool> ValidateWidget(EventWidget widget)
+    private bool IsValidForm()
     {
-        var validationContext = new ValidationContext(widget);
-        var validationResults = new List<ValidationResult>();
+        return !string.IsNullOrEmpty(newWidget.Title)
+            && !string.IsNullOrEmpty(newWidget.Description)
+            && newWidget.EventDate != DateTime.MinValue;
+    }
 
-        var isValid = await Task.Run(() => Validator.TryValidateObject(widget, validationContext, validationResults, true));
-
-        if (!isValid)
-        {
-            foreach (var validationResult in validationResults)
-            {
-                var propertyNames = validationResult.MemberNames.Any()
-                    ? validationResult.MemberNames
-                    : new string[] { null };
-
-                foreach (var propertyName in propertyNames)
-                {
-                    var errorKey = propertyName != null
-                        ? $"{propertyName}"
-                        : "";
-
-                    var errorMessage = validationResult.ErrorMessage;
-                }
-            }
-        }
-
-        return isValid;
+    private bool ValidationErrorsExist()
+    {
+        return !IsValidForm();
     }
 
     private async Task HandleFileChange(InputFileChangeEventArgs e)

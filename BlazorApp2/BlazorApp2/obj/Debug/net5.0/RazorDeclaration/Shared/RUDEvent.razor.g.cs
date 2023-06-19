@@ -83,8 +83,22 @@ using BlazorApp2.Shared;
 #line hidden
 #nullable disable
 #nullable restore
+#line 11 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
+using Blazorise;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
 #line 12 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
 using Blazorise.Bootstrap;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 13 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\_Imports.razor"
+using Blazorise.Icons.FontAwesome;
 
 #line default
 #line hidden
@@ -131,20 +145,6 @@ using BlazorApp2.Services;
 #line default
 #line hidden
 #nullable disable
-#nullable restore
-#line 5 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\RUDEvent.razor"
-using Blazorise;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 6 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\RUDEvent.razor"
-using Blazorise.Icons.FontAwesome;
-
-#line default
-#line hidden
-#nullable disable
     public partial class RUDEvent : global::Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
@@ -153,7 +153,7 @@ using Blazorise.Icons.FontAwesome;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 111 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\RUDEvent.razor"
+#line 128 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\RUDEvent.razor"
        
     private List<EventWidget> widgets;
     private bool showDeleteConfirmation = false;
@@ -161,7 +161,7 @@ using Blazorise.Icons.FontAwesome;
     private EventWidget editedWidget;
     private List<byte[]> uploadedImages = new List<byte[]>();
     private bool deleteAllImages = false;
-    
+
 
 
     [Inject]
@@ -172,7 +172,7 @@ using Blazorise.Icons.FontAwesome;
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         widgets = await WidgetService.SortWidgetsByDate();
     }
 
@@ -193,26 +193,43 @@ using Blazorise.Icons.FontAwesome;
         var widgetToUpdate = await WidgetService.GetWidgetById(widget.Id);
         if (widgetToUpdate != null)
         {
+            if (editedWidget.EventDate == DateTime.MinValue || string.IsNullOrEmpty(editedWidget.Title) || string.IsNullOrEmpty(editedWidget.Description))
+            {
+                return;
+            }
             widgetToUpdate.Title = widget.Title;
             widgetToUpdate.Description = widget.Description;
             widgetToUpdate.EventDate = widget.EventDate;
+            widgetToUpdate.Images = widget.Images;
 
             if (deleteAllImages)
             {
-                widgetToUpdate.Images.Clear();
                 uploadedImages.Clear();
+                widgetToUpdate.Images.AddRange(uploadedImages);
             }
             else if (uploadedImages.Count > 0)
             {
-                widgetToUpdate.Images = uploadedImages;
+                widgetToUpdate.Images.AddRange(uploadedImages);
             }
+
 
             await WidgetService.UpdateWidget(widgetToUpdate, uploadedImages);
             uploadedImages.Clear();
-            editedWidget = null;
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
 
         }
+    }
+
+    private bool IsValidForm()
+    {
+        return !string.IsNullOrEmpty(editedWidget.Title)
+            && !string.IsNullOrEmpty(editedWidget.Description)
+            && editedWidget.EventDate != DateTime.MinValue;
+    }
+
+    private bool ValidationErrorsExist()
+    {
+        return !IsValidForm();
     }
 
     private async Task DeleteWidget()

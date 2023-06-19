@@ -2,8 +2,6 @@
 @using System.ComponentModel.DataAnnotations
 @using System.IO
 @using BlazorApp2.Services
-@using Blazorise
-@using Blazorise.Icons.FontAwesome
 
 
 <h3>Список событий</h3>
@@ -22,7 +20,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var widget in widgets.OrderBy(w => w.EventDate))
+                @foreach (var widget in widgets)
                 {
                     <tr>
                         <td>@widget.Title</td>
@@ -62,14 +60,29 @@ else
                 <div>
                     <label>Название:</label>
                     <InputText @bind-Value="@editedWidget.Title" />
+                    <ValidationMessage For="@(() => editedWidget.Title)" />
+                    @if (string.IsNullOrEmpty(editedWidget.Title))
+                    {
+                        <p class="text-danger">Поле 'Название' не может быть пустым.</p>
+                    }
                 </div>
                 <div>
                     <label>Описание:</label>
                     <InputText @bind-Value="@editedWidget.Description" />
+                    <ValidationMessage For="@(() => editedWidget.Description)" />
+                    @if (string.IsNullOrEmpty(editedWidget.Description))
+                    {
+                        <p class="text-danger">Поле 'Описание' не может быть пустым.</p>
+                    }
                 </div>
                 <div>
                     <label>Дата:</label>
                     <InputDate @bind-Value="@editedWidget.EventDate" />
+                     <ValidationMessage For="@(() => editedWidget.EventDate)" />
+                    @if (editedWidget.EventDate == default)
+                    {
+                        <p class="text-danger">Поле 'Дата' должно быть заполнено.</p>
+                    }
                 </div>
                 <div>
                     <label>Удалить все картинки:</label>
@@ -82,10 +95,14 @@ else
                 <div>
                     <button type="submit">Сохранить</button>
                     <button type="button" @onclick="CancelEdit">Отмена</button>
+                    @if (ValidationErrorsExist())
+                    {
+                        <p class="text-danger">Пожалуйста, исправьте все ошибки перед сохранением события.</p>
+                    }
                 </div>
             </EditForm>
         </div>
-    </div>
+    </div> 
 }
 
 @if (showDeleteConfirmation)
@@ -115,7 +132,7 @@ else
     private EventWidget editedWidget;
     private List<byte[]> uploadedImages = new List<byte[]>();
     private bool deleteAllImages = false;
-    
+
 
 
     [Inject]
@@ -126,7 +143,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         widgets = await WidgetService.SortWidgetsByDate();
     }
 
@@ -147,26 +164,43 @@ else
         var widgetToUpdate = await WidgetService.GetWidgetById(widget.Id);
         if (widgetToUpdate != null)
         {
+            if (editedWidget.EventDate == DateTime.MinValue || string.IsNullOrEmpty(editedWidget.Title) || string.IsNullOrEmpty(editedWidget.Description))
+            {
+                return;
+            }
             widgetToUpdate.Title = widget.Title;
             widgetToUpdate.Description = widget.Description;
             widgetToUpdate.EventDate = widget.EventDate;
+            widgetToUpdate.Images = widget.Images;
 
             if (deleteAllImages)
             {
-                widgetToUpdate.Images.Clear();
                 uploadedImages.Clear();
+                widgetToUpdate.Images.AddRange(uploadedImages);
             }
             else if (uploadedImages.Count > 0)
             {
-                widgetToUpdate.Images = uploadedImages;
+                widgetToUpdate.Images.AddRange(uploadedImages);
             }
+
 
             await WidgetService.UpdateWidget(widgetToUpdate, uploadedImages);
             uploadedImages.Clear();
-            editedWidget = null;
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
 
         }
+    }
+
+    private bool IsValidForm()
+    {
+        return !string.IsNullOrEmpty(editedWidget.Title)
+            && !string.IsNullOrEmpty(editedWidget.Description)
+            && editedWidget.EventDate != DateTime.MinValue;
+    }
+
+    private bool ValidationErrorsExist()
+    {
+        return !IsValidForm();
     }
 
     private async Task DeleteWidget()

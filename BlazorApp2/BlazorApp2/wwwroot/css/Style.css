@@ -1,12 +1,11 @@
-﻿
+﻿/* Стили для вывода ошибок при валидации */
 
 
-
-
-
-#widgetTable {
-    animation: none !important;
+.text-danger {
+    font-size: 0.85em;
+    color: red;
 }
+
 
 /* Стили для создания событий */
 .event-form {

@@ -61,6 +61,8 @@ namespace BlazorApp2.Services
             _context.EventWidgets.Remove(widget);
             await _context.SaveChangesAsync();
         }
+
+
     }
 
 }

@@ -119,27 +119,20 @@ using Blazorise.Components;
 #nullable disable
 #nullable restore
 #line 1 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
-using BlazorApp2.Models;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 2 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
-using System.ComponentModel.DataAnnotations;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 3 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
 using System.IO;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 4 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
+#line 2 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
+using BlazorApp2.Models;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 3 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
 using BlazorApp2.Services;
 
 #line default
@@ -153,7 +146,7 @@ using BlazorApp2.Services;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 31 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
+#line 43 "C:\Users\Максим\source\repos\BlazorApp1\BlazorApp2\BlazorApp2\Shared\EventCreate.razor"
        
     private EventWidget newWidget = new EventWidget { EventDate = DateTime.Today };
     private List<byte[]> uploadedImages = new List<byte[]>();
@@ -164,43 +157,29 @@ using BlazorApp2.Services;
     [Inject]
     private NavigationManager NavigationManager { get; set; }
 
+
     private async Task CreateWidget()
     {
-        if (await ValidateWidget(newWidget))
+        if (!IsValidForm())
         {
-            await WidgetService.AddWidget(newWidget, uploadedImages);
-            ClearForm();
-            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+            return;
         }
+
+        await WidgetService.AddWidget(newWidget, uploadedImages);
+        ClearForm();
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
 
-    private async Task<bool> ValidateWidget(EventWidget widget)
+    private bool IsValidForm()
     {
-        var validationContext = new ValidationContext(widget);
-        var validationResults = new List<ValidationResult>();
+        return !string.IsNullOrEmpty(newWidget.Title)
+            && !string.IsNullOrEmpty(newWidget.Description)
+            && newWidget.EventDate != DateTime.MinValue;
+    }
 
-        var isValid = await Task.Run(() => Validator.TryValidateObject(widget, validationContext, validationResults, true));
-
-        if (!isValid)
-        {
-            foreach (var validationResult in validationResults)
-            {
-                var propertyNames = validationResult.MemberNames.Any()
-                    ? validationResult.MemberNames
-                    : new string[] { null };
-
-                foreach (var propertyName in propertyNames)
-                {
-                    var errorKey = propertyName != null
-                        ? $"{propertyName}"
-                        : "";
-
-                    var errorMessage = validationResult.ErrorMessage;
-                }
-            }
-        }
-
-        return isValid;
+    private bool ValidationErrorsExist()
+    {
+        return !IsValidForm();
     }
 
     private async Task HandleFileChange(InputFileChangeEventArgs e)
